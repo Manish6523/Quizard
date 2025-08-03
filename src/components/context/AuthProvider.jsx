@@ -185,6 +185,23 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const fetchChats = async () => {
+    if (!user) return;
+
+    const { data, error } = await client
+      .from("chats")
+      .select("id, title, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching chats:", error);
+    } else {
+      console.log("Fetched chats:", data);
+      return data;
+    }
+  }
+
   const states = { user, loading, coin, avatar };
   const actions = {
     refetchUser,
@@ -195,6 +212,7 @@ const AuthProvider = ({ children }) => {
     deleteQuizById,
     getChatById,
     saveChatToSupabase,
+    fetchChats
   };
 
   return (

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 export function Footer() {
 const pathname = usePathname();
 // Check if the current path is the dashboard
-const isDashboard = pathname.startsWith('/dashboard/quizzes');
+const isDashboard = pathname.startsWith('/quizzes');
 // If on the dashboard, do not render the footer
 if (isDashboard) {
     return null;

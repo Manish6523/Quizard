@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import { redirect, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -33,12 +33,20 @@ import useAuth from "@/hook/useAuth";
 import { QuizList } from "@/components/QuizList";
 
 // --- Placeholder Components ---
-const AnalyticsView = () => (
+const AnalyticsView = ({chats}) => (
   <Card>
     <CardHeader>
       <CardTitle>Analytics</CardTitle>
       <CardDescription>
-        Analytics and reports will be displayed here.
+        {chats.map((c) => (
+          <ul key={c.id} className="list-disc pl-5">
+            <li key={c.id} className="mb-2">
+              <Link href={`/quizzes/chat/${c.id}`}>
+                {c.title} - {new Date(c.created_at).toLocaleDateString()}
+              </Link>
+            </li>
+          </ul>
+        ))}
       </CardDescription>
     </CardHeader>
   </Card>
@@ -123,8 +131,9 @@ const icons = { FileText, BarChart3, Settings, CreditCard, User };
 
 export default function DashboardPage() {
 
-  const { user, loading, avatar } = useAuth();
-  console.log("avatar", avatar);
+  const { user, loading, avatar, fetchChats } = useAuth();
+
+  const [chats, setChats] = useState([]);
 
   const [activeView, setActiveView] = useState("Profile");
   // State to control the mobile sheet's open/closed status
@@ -133,6 +142,19 @@ export default function DashboardPage() {
   if (!loading && !user) {
     redirect("/login");
   }
+
+
+  useEffect(()=>{
+    const fetchqqq = async () => {
+      if (user) {
+        const fetchedChats = await fetchChats();
+        console.log("Fetched chats:", fetchedChats);
+        setChats(fetchedChats || []);
+      }
+    }
+    fetchqqq()
+  },[user])
+
 
   const dashboardNav = [
     { name: "Profile", icon: "User" },
@@ -155,7 +177,7 @@ export default function DashboardPage() {
       case "My Quizzes":
         return <QuizList />;
       case "Analytics":
-        return <AnalyticsView />;
+        return <AnalyticsView chats={chats} />;
       case "Settings":
         return <SettingsView />;
       case "Billing":
@@ -165,9 +187,8 @@ export default function DashboardPage() {
     }
   };
 
-
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr] pt-20">
       {/* --- Desktop Sidebar --- */}
       <aside className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">

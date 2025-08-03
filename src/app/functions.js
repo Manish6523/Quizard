@@ -6,7 +6,6 @@ export async function generateQuiz( prompt, numQuestions, difficulty ) {
   if (!prompt) {
     throw new Error("Prompt is required to generate a quiz.");
   }
-  console.log("Generating quiz with prompt:", prompt);
 
   if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
     throw new Error(
@@ -41,7 +40,6 @@ export async function generateQuiz( prompt, numQuestions, difficulty ) {
         status: 500,
       };
     }
-    console.log("User coin balance:", profile.coin_balance);
 
     if (profile.coin_balance < 10) {
       return {
@@ -215,8 +213,6 @@ Difficulty level: ${difficulty}
         quiz: quizData,
       };
     }
-    console.log("Coins deducted successfully.");
-    console.log("Quiz data to be saved:", quizData);
     // 7. Return quiz
     return {
       success: true,

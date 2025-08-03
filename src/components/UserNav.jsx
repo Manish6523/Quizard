@@ -65,7 +65,7 @@ export function UserNav({ user }) {
                 <Link href="/dashboard">Dashboard</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/quizzes/new">New Quiz</Link>
+                <Link href="/quizzes/new">New Quiz</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/dashboard/settings">Settings</Link>

@@ -20,7 +20,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background py-20">
       <main className="flex-1">
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-20 md:py-40">
@@ -48,7 +48,7 @@ export default function HomePage() {
                 variants={featureVariants}
                 className="mt-8 flex flex-col sm:flex-row justify-center md:justify-start gap-4"
               >
-                <Link href="/dashboard/quizzes/new">
+                <Link href="/quizzes/new">
                   <Button size="lg" className="w-full sm:w-auto gap-2">
                     Start Creating Now <ArrowRight className="w-5 h-5" />
                   </Button>

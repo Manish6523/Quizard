@@ -167,7 +167,7 @@ export function QuizList() {
             Get started by creating your first AI-generated quiz.
           </p>
           <Button asChild>
-            <Link href="/dashboard/quizzes/new">
+            <Link href="/quizzes/new">
               <PlusCircle className="mr-2 h-4 w-4" /> Create New Quiz
             </Link>
           </Button>
@@ -194,7 +194,7 @@ export function QuizList() {
               title="Generate new Quiz"
               asChild
             >
-              <Link href="/dashboard/quizzes/new">
+              <Link href="/quizzes/new">
                 <PlusCircle />
               </Link>
             </Button>
@@ -227,13 +227,13 @@ export function QuizList() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <Button variant="outline" size="icon" asChild>
-                    <Link href={`/dashboard/quizzes/results/${quiz.id}`}>
+                    <Link href={`/quizzes/results/${quiz.id}`}>
                       <BarChart3 className="h-4 w-4" />
                       <span className="sr-only">View Results</span>
                     </Link>
                   </Button>
                   <Button variant="outline" size="icon" asChild>
-                    <Link href={`/dashboard/quizzes/edit/${quiz.id}`}>
+                    <Link href={`/quizzes/edit/${quiz.id}`}>
                       <Pencil className="h-4 w-4" />
                       <span className="sr-only">Edit Quiz</span>
                     </Link>

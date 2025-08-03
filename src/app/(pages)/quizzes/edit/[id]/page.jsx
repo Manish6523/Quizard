@@ -203,7 +203,7 @@ export default function EditQuizPage() {
   return (
     <>
       <PaymentPromptDialog isOpen={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen} title={''} />
-      <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-6">
+      <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-6 mt-20">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4" />

@@ -5,9 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
 import useAuth from "@/hook/useAuth";
 import { UserNav } from "./UserNav";
+import { usePathname } from "next/navigation";
 
 export function Navbar() {
   const { user, loading } = useAuth();
+  const pathname = usePathname();
+  
+  if(pathname === "/login" || pathname === "/register" || pathname.includes('/quizzes/chat/') ){
+    return null; // Don't render Navbar on login or register pages
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-20 px-4 md:px-8 bg-background/80 backdrop-blur-sm border-b">

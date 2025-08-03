@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -38,6 +37,7 @@ import {
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 // NOTE: These helper components can be moved to a shared file.
 function QuizViewer({ quizData, onSave, isSaving }) {
@@ -150,7 +150,7 @@ export default function ChatPage() {
         setUserInput((prev) => ({ ...prev, title: response.chat.title }));
       } else {
         toast.error("Failed to load chat", { description: response.error });
-        router.push("/dashboard/quizzes/new"); // Redirect if chat not found
+        router.push("/quizzes/new"); // Redirect if chat not found
       }
       setPageLoading(false);
     };
@@ -184,7 +184,7 @@ export default function ChatPage() {
       if (response.success && response.chatId) {
         if (!chatId) {
           setChatId(response.chatId);
-          router.replace(`/dashboard/quizzes/chat/${response.chatId}`);
+          router.replace(`/quizzes/chat/${response.chatId}`);
         }
         toast.success("Chat updated successfully!");
       } else {
@@ -269,16 +269,19 @@ export default function ChatPage() {
     }
   };
 
-  const handleSaveQuiz = async () => {
-    if (!quizData) return;
+  // ⭐️⭐️⭐️ CHANGE #1: UPDATE THE FUNCTION SIGNATURE ⭐️⭐️⭐️
+  const handleSaveQuiz = async (quizToSave) => {
+    // Now it accepts the specific quiz data as an argument
+    if (!quizToSave) return; // Check the argument, not the state
+
     setIsSaving(true);
     try {
-      const response = await saveQuizToSupabase(quizData);
+      // Use the quizToSave argument to save the correct quiz
+      const response = await saveQuizToSupabase(quizToSave);
       if (response.error) {
         toast.error("Error saving quiz", { description: response.error });
       } else {
         toast.success("Quiz saved successfully!");
-        router.push(`/dashboard/quizzes/edit/${response.quizId}`);
       }
     } catch (error) {
       toast.error("Failed to save quiz", {
@@ -298,16 +301,16 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="relative flex flex-col h-[calc(100vh-5rem)] max-w-2xl lg:max-w-4xl mx-auto">
+    <div className="relative flex flex-col h-screen max-w-2xl lg:max-w-4xl mx-auto">
       {/* Header */}
-      {/* <div className="p-4 border-b">
+      <div className="p-4 border-b">
         <h1 className="text-2xl font-bold truncate">
           {userInput.title || "Chat"}
         </h1>
         <p className="text-muted-foreground">
           Continue your conversation or add to your quiz.
         </p>
-      </div> */}
+      </div>
 
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
@@ -337,14 +340,20 @@ export default function ChatPage() {
                     : "bg-muted w-full px-4 py-3"
                 }`}
               >
-                {msg.type === "quiz" ? (
+                {msg.type === "quiz" &&
+                Array.isArray(msg.data?.questions) &&
+                msg.data.questions[0]?.options ? (
                   <QuizViewer
                     quizData={msg.data}
-                    onSave={handleSaveQuiz}
+                    onSave={() => handleSaveQuiz(msg.data)}
                     isSaving={isSaving}
                   />
                 ) : (
-                  <p className="text-sm leading-relaxed">{msg.content}</p>
+                  <p className="text-sm leading-relaxed">
+                    {typeof msg.content === "string"
+                      ? msg.content
+                      : msg.data?.questions?.[0]?.message || "No response."}
+                  </p>
                 )}
               </div>
               {msg.role === "user" && (

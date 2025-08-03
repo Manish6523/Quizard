@@ -22,12 +22,12 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <AuthProvider>
-            <Navbar />
-            <main className="pt-20">
-            {children}
-            </main>
-            <Footer />
-            <Toaster />
+              <Navbar />
+              <main className={""}>
+                {children}
+              </main>
+              <Footer />
+              <Toaster />
           </AuthProvider>
         </ThemeProvider>
       </body>

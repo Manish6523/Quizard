@@ -8,7 +8,6 @@ const ThemeToggler = () => {
 
   const [currentTheme, setCurrentTheme] = useState(systemTheme || "light");
 
-  // console.log("Current theme:", theme);
 
   const toggleTheme = () => {
     setTheme((currentTheme) => (currentTheme === "light" ? "dark" : "light"));
