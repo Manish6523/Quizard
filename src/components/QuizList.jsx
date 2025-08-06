@@ -26,6 +26,7 @@ import {
   Pencil,
   Trash2,
   Loader2,
+  Settings,
 } from "lucide-react";
 import useAuth from "@/hook/useAuth";
 import { toast } from "sonner";
@@ -212,7 +213,9 @@ export function QuizList() {
               >
                 <div className="mb-3 sm:mb-0">
                   <div className="flex items-center gap-2">
+                    <Link href={`/quizzes/take/${quiz.id}`}>
                     <h3 className="font-semibold text-lg">{quiz.title}</h3>
+                    </Link>
                     <Badge
                       variant={
                         quiz.status === "published" ? "default" : "secondary"
@@ -236,6 +239,12 @@ export function QuizList() {
                     <Link href={`/quizzes/edit/${quiz.id}`}>
                       <Pencil className="h-4 w-4" />
                       <span className="sr-only">Edit Quiz</span>
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="icon" asChild>
+                    <Link href={`/quizzes/settings/${quiz.id}`}>
+                      <Settings className="h-4 w-4" />
+                      <span className="sr-only">Setting Quiz</span>
                     </Link>
                   </Button>
                   <Button

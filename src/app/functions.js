@@ -209,7 +209,7 @@ export async function saveQuiz(quizData) {
   return { success: true, quizId: quizSet.id };
 }
 
-// ⭐️ REVISED saveChat function ⭐️
+// ⭐️ saveChat function ⭐️
 export async function saveChat({ messages, title, chatId = null }) {
   try {
     const { data: sessionData } = await client.auth.getSession();
@@ -256,7 +256,7 @@ export async function saveChat({ messages, title, chatId = null }) {
   }
 }
 
-// ⭐️ REVISED fetchChatById function ⭐️
+// ⭐️ fetchChatById function ⭐️
 export async function fetchChatById(chatId) {
   try {
     const { data: sessionData } = await client.auth.getSession();
@@ -279,5 +279,44 @@ export async function fetchChatById(chatId) {
   } catch (error) {
     console.error("Unexpected error in fetchChatById:", error);
     return { error: "An unexpected error occurred." };
+  }
+}
+
+// ⭐️ submit attempted Quiz to supabase ⭐️
+export async function submitQuizAttempt({
+  quizId,
+  participantName,
+  score,
+  submittedAnswers,
+}) {
+  try {
+    // Get the current user's session, if they are logged in
+    const { data: sessionData } = await client.auth.getSession();
+    const user = sessionData.session?.user;
+
+    // Prepare the data for insertion
+    const attemptData = {
+      quiz_set_id: quizId,
+      user_id: user.id, // Store user_id if logged in
+      participant_name: participantName,
+      score: score,
+      submitted_answers: submittedAnswers,
+    };
+
+    // Insert the new attempt into the database
+    const { data: newAttempt, error } = await client
+      .from("quiz_attempts")
+      .insert(attemptData)
+      .select("id")
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return { success: true, attemptId: newAttempt.id };
+  } catch (error) {
+    console.error("Error submitting quiz attempt:", error);
+    return { error: "Failed to save your quiz results." };
   }
 }

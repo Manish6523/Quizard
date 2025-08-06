@@ -6,6 +6,7 @@ import {
   saveQuiz,
   saveChat,
   fetchChatById,
+  submitQuizAttempt,
 } from "@/app/functions";
 import { createContext, useEffect, useState } from "react";
 
@@ -100,9 +101,14 @@ const AuthProvider = ({ children }) => {
   };
 
   // ?------ Run function to fetch apis ------
-  const getQuiz = async (prompt, numQuestions, difficulty,history) => {
+  const getQuiz = async (prompt, numQuestions, difficulty, history) => {
     try {
-      const response = await generateQuiz(prompt, numQuestions, difficulty, history);
+      const response = await generateQuiz(
+        prompt,
+        numQuestions,
+        difficulty,
+        history
+      );
       fetchCoinBalance(); // Update coin balance after generating quiz
       return response;
     } catch (error) {
@@ -200,7 +206,78 @@ const AuthProvider = ({ children }) => {
       // console.log("Fetched chats:", data);
       return data;
     }
-  }
+  };
+  // ?------ Run quizzes function for supabase ------
+  const fetchQuizById = async (quizId) => {
+    try {
+      if (!user) return { error: "You must be logged in to fetch a quiz." };
+      const { data: quizData, error: quizError } = await client
+        .from("quiz_sets")
+        .select("id, title, quizzes,settings,creator_id") // Select the quizzes column
+        .eq("id", quizId)
+        .single();
+
+      if (quizError || !quizData) {
+        return { error: "Quiz not found or permission denied." };
+      }
+
+      // The quiz object now directly contains the quizzes (questions)
+      return { success: true, quiz: quizData };
+    } catch (error) {
+      console.error("Unexpected error in fetchQuizById:", error);
+      return { error: "An unexpected error occurred." };
+    }
+  };
+
+  const submitQuizResult = async ({
+    quizId,
+    participantName,
+    score,
+    submittedAnswers,
+  }) => {
+    try {
+      const response = await submitQuizAttempt({
+        quizId,
+        participantName,
+        score,
+        submittedAnswers,
+      });
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      return response;
+    } catch (error) {
+      console.error("Error in submitQuizAttempt wrapper:", error);
+      return { error: error.message };
+    }
+  };
+
+  // ?------ update settings ------
+  const updateQuizSettings = async ({ quizId, settings, status }) => {
+    if (!user) return { error: "You must be logged in to update settings." };
+    if (!quizId) return { error: "Quiz ID is required." };
+
+    try {
+      const { error } = await client
+        .from("quiz_sets")
+        .update({
+          settings: settings,
+          status: status,
+        })
+        .eq("id", quizId)
+        .eq("creator_id", user.id); // Security check
+
+      if (error) {
+        throw error;
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating quiz settings:", error);
+      return { error: "Failed to update the quiz settings." };
+    }
+  };
 
   const states = { user, loading, coin, avatar };
   const actions = {
@@ -212,7 +289,10 @@ const AuthProvider = ({ children }) => {
     deleteQuizById,
     getChatById,
     saveChatToSupabase,
-    fetchChats
+    fetchChats,
+    fetchQuizById,
+    submitQuizResult,
+    updateQuizSettings,
   };
 
   return (
