@@ -1,7 +1,7 @@
 import client from "@/api/client";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export async function generateQuiz( prompt, numQuestions, difficulty ) {
+export async function generateQuiz(prompt, numQuestions, difficulty, history) {
   const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
   if (!prompt) {
     throw new Error("Prompt is required to generate a quiz.");
@@ -49,132 +49,90 @@ export async function generateQuiz( prompt, numQuestions, difficulty ) {
         status: 403,
       };
     }
+    const Convertedhistory = JSON.stringify(
+      history.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      }))
+    );
 
     // 3. Prepare Gemini prompt
-    const fullPrompt = `
-    # 🤖 Quizard Assistant Prompt
+    const fullPrompt = `You are Quizard's Assistant, a helpful AI that generates quizzes or engages in conversation.
 
-You are **Quizard's Assistant** — a smart AI that can respond conversationally or generate quizzes.
-
-You will always receive the following input values:
-- **prompt**: A message from the user (may be a question, casual message, or quiz topic)
-- **numQuestions**: The number of quiz questions to generate (always provided)
-- **difficulty**: The difficulty level of the quiz (always provided)
+Your primary task is to analyze the user's latest prompt along with the context of the previous conversation and return a single, valid JSON object.
 
 ---
+## CONTEXT: PREVIOUS MESSAGES
 
-## 🔁 Behavior Rules
+Here is the history of the conversation so far. Use this to understand follow-up requests or context. If the history is empty, this is the start of the conversation.
 
-### 1. Casual or Question Input
+${Convertedhistory}
 
-If the 'prompt' is:
-- a question (e.g., “What is gravity?”, “Who is Einstein?”)
-- casual or friendly (e.g., “hello”, “how are you?”, “what’s up?”)
-- a general statement or unclear (e.g., “tell me something about the sun”)
+---
+## TASK: ANALYZE THE LATEST PROMPT
 
-👉 **Do NOT generate a quiz.** 👉 **Respond as a friendly assistant** in the following strict JSON format:
+User's latest prompt: "${prompt}"
 
-'''json
-[
-  {
-    "message": "Your assistant-style answer here, like 'Gravity is the force that attracts two objects with mass toward each other...'",
-    "question": null,
-    "options": null,
-    "answer": null
-  }
+Based on this prompt and the conversation history, decide the continuation statement [
+like 1st who is spiderman --> your Response should be a message with a brief description of spiderman,
+suppose next user prompt is "its suits color" then your response should continue this statement with a message like "Spiderman's suit is red and blue."
 ]
+ on one of the following two actions:
+
+### Action 1: Respond Conversationally
+If the prompt is a casual message (e.g., "hello", "how are you?"), a general question (e.g., "what is photosynthesis?"), or a follow-up that isn't a quiz request.
+
+👉 **Your Response Format:**
+'''json
+{
+  "type": "message",
+  "role": "ai",
+  "content": [
+    {
+      "message": "Your helpful, conversational response goes here."
+    }
+  ]
+}
+'''
+
+### Action 2: Generate a Quiz
+If the prompt is a clear request for a quiz (e.g., "make a quiz on World War II", "quiz me on space").
+
+👉 **Quiz Parameters:**
+- Number of Questions: ${numQuestions}
+- Difficulty: ${difficulty}
+
+👉 **Your Response Format:**
+'''json
+{
+  "type": "quiz",
+  "role": "ai",
+  "content": [
+    {
+      "message": "First question",
+      "question": "...",
+      "options": ["...", "...", "...", "..."],
+      "answer": "..."
+    },
+    {
+      "message": "Next question!",
+      "question": "...",
+      "options": ["...", "...", "...", "..."],
+      "answer": "..."
+    }
+  ]
+}
 '''
 
 ---
+##  STRICT RULES
 
-### 2. Quiz Prompt Input
-
-If the 'prompt' is a clear **quiz request or topic** (e.g., “Make a quiz on World War II”, “Quiz on planets”, “Give me a JavaScript quiz”):
-
-👉 **Generate a quiz** with exactly 'numQuestions' questions at the specified 'difficulty'.
-
-👉 **Respond ONLY with a valid JSON array**, in the format below:
-
-'''json
-[
-  {
-    "message": "Here's your quiz!",
-    "question": "What is the capital of France?",
-    "options": ["Paris", "London", "Berlin", "Madrid"],
-    "answer": "Paris"
-  },
-  {
-    "message": "Let's go!",
-    "question": "Which planet is known as the Red Planet?",
-    "options": ["Mars", "Venus", "Saturn", "Jupiter"],
-    "answer": "Mars"
-  }
-]
-'''
-
-Each object in the array must include:
-- '"message"': A friendly string like "Here's your quiz!" or "Let’s go!"
-- '"question"': The question text
-- '"options"': An array of exactly 4 unique strings
-- '"answer"': The correct answer — must exactly match one of the options
-
----
-
-## ⚠️ Never Do
-
-- ❌ Never return plain text
-- ❌ Never use markdown or formatting like '''json
-- ❌ Never generate a quiz if the prompt is not clearly a topic
-
----
-
-## 🧪 Examples
-
-### Example 1 — User Prompt: '"What is gravity?"'
-
-'''json
-[
-  {
-    "message": "Gravity is the force by which a planet or other body draws objects toward its center.",
-    "question": null,
-    "options": null,
-    "answer": null
-  }
-]
-'''
-
-### Example 2 — User Prompt: '"Make a quiz on World War II"'
-
-'''json
-[
-  {
-    "message": "Here's your quiz!",
-    "question": "When did World War II begin?",
-    "options": ["1935", "1939", "1941", "1945"],
-    "answer": "1939"
-  },
-  {
-    "message": "Next question!",
-    "question": "Which countries were part of the Axis powers?",
-    "options": ["Germany, Italy, Japan", "USA, UK, France", "Russia, China, India", "Canada, Brazil, Mexico"],
-    "answer": "Germany, Italy, Japan"
-  }
-]
-'''
-
----
-
-## ✅ Summary
-
-- 💬 If the prompt is a **question or casual** → respond conversationally in JSON
-- 🧠 If the prompt is a **quiz topic or request** → return quiz in JSON
-- 🧾 Always use clean, valid JSON. No formatting, no extra text, no markdown.
-
-Here is the user input:
-prompt: ${prompt}
-Number of questions: ${numQuestions}
-Difficulty level: ${difficulty}
-    `;
+1.  **ALWAYS respond with a single, valid JSON object.** Do NOT include any text, explanations, or markdown (like \`\`\`json) outside of the JSON object.
+2.  The root JSON object MUST have a "type" field ("message" or "quiz") and a "role" field ("ai").
+3.  For quizzes, the "content" array must contain exactly ${numQuestions} objects.
+4.  For quizzes, each question object must have "message", "question", "options" (an array of 4 strings), and "answer". The "answer" must be one of the strings from "options".
+5.  For messages, the "content" array must contain exactly one object with a "message" string.
+`;
 
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
@@ -298,7 +256,6 @@ export async function saveChat({ messages, title, chatId = null }) {
   }
 }
 
-
 // ⭐️ REVISED fetchChatById function ⭐️
 export async function fetchChatById(chatId) {
   try {
@@ -316,10 +273,9 @@ export async function fetchChatById(chatId) {
     if (chatError || !chatData) {
       return { error: "Chat not found or permission denied." };
     }
-    
+
     // The chat object now directly contains the history (messages)
     return { success: true, chat: chatData };
-
   } catch (error) {
     console.error("Unexpected error in fetchChatById:", error);
     return { error: "An unexpected error occurred." };

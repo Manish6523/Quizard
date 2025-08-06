@@ -100,9 +100,9 @@ const AuthProvider = ({ children }) => {
   };
 
   // ?------ Run function to fetch apis ------
-  const getQuiz = async (prompt, numQuestions, difficulty) => {
+  const getQuiz = async (prompt, numQuestions, difficulty,history) => {
     try {
-      const response = await generateQuiz(prompt, numQuestions, difficulty);
+      const response = await generateQuiz(prompt, numQuestions, difficulty, history);
       fetchCoinBalance(); // Update coin balance after generating quiz
       return response;
     } catch (error) {
@@ -197,7 +197,7 @@ const AuthProvider = ({ children }) => {
     if (error) {
       console.error("Error fetching chats:", error);
     } else {
-      console.log("Fetched chats:", data);
+      // console.log("Fetched chats:", data);
       return data;
     }
   }

@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Paperclip, SendHorizontal, Settings } from "lucide-react";
 import { motion } from "framer-motion";
-import React, { useRef, useState } from "react";
+import React, { use, useRef, useState } from "react";
 import useAuth from "@/hook/useAuth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -50,73 +50,46 @@ const Page = () => {
     file: null,
   });
 
-  const [chat, setChat] = useState([
-    {
-      role: "ai",
-      content:
-        "Welcome! Ask a question or set your quiz options and describe a topic to begin.",
-    },
-  ]);
+  const [chat, setChat] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
- const handleSend = async () => {
-  if (!userInput.prompt) return;
 
-  try {
+  const handleSend = async () => {
+    if (loading || !userInput.prompt) return;
     setLoading(true);
 
-    const newUserMessage = { role: "user", content: userInput.prompt };
-    const updatedChat = [...chat, newUserMessage];
-    setChat(updatedChat); // Optimistic UI
+    const history = []
 
-    const genResponse = await getQuiz(
+    const response = await getQuiz(
       userInput.prompt,
       userInput.numberOfQuestions,
-      userInput.difficulty
+      userInput.difficulty,
+      history
     );
 
-    if (!genResponse || !genResponse.quiz) {
-      toast.error("Failed to generate quiz. Please try again.");
-      setLoading(false);
-      return;
-    }
+    if (response.success) {
 
-    const newAIMessage =
-      Array.isArray(genResponse.quiz) && genResponse.quiz.length
-        ? {
-            role: "ai",
-            type: "quiz",
-            data: {
-              title: userInput.title,
-              questions: genResponse.quiz,
-            },
-          }
-        : {
-            role: "ai",
-            content: String(genResponse.quiz), // fallback string
-          };
+      // Save the chat to Supabase
+      let newChat = [
+        { role: "user", type: "message", content: userInput.prompt },
+        response.quiz,
+      ];
+      // console.log("New chat to save:", newChat);
+      const saveResponse = await saveChatToSupabase({
+        messages: newChat,
+        title: userInput.title,
+      })
 
-    const finalChat = [...updatedChat, newAIMessage];
-
-    const saveResponse = await saveChatToSupabase({
-      messages: finalChat,
-      title: userInput.title,
-    });
-
-    if (!saveResponse || !saveResponse.chatId) {
-      toast.error("Failed to save quiz. Please try again.");
-    } else {
+      if (saveResponse.success) {
+        // console.log("Chat saved successfully:", saveResponse);
       router.push(`/quizzes/chat/${saveResponse.chatId}`);
+      }
+    } else {
+      toast.error("Failed to generate quiz: " + response.error);
     }
-  } catch (error) {
-    toast.error("An unexpected error occurred.");
-    console.error("Quiz generation error:", error);
-  } finally {
     setLoading(false);
-  }
-};
-
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -143,7 +116,7 @@ const Page = () => {
 
   return (
     <motion.main
-      className="min-h-screen container mx-auto p-4 flex items-center justify-center flex-col gap-10 md:gap-14"
+      className="h-[85vh] md:h-screen container mx-auto p-2 flex items-center justify-center flex-col gap-10  md:gap-14"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -167,7 +140,7 @@ const Page = () => {
         <div>
           <textarea
             placeholder="Ask Quizard..."
-            className="max-h-[200px] min-h-[80px] p-3 w-full border-0 bg-secondary outline-0 ring-0 resize-none"
+            className="max-h-[200px] min-h-[40px] sm:min-h-[80px] p-1 pt-3 sm:pt-0 sm:p-3 w-full border-0 bg-secondary outline-0 ring-0 resize-none"
             value={userInput.prompt}
             onChange={(e) =>
               setUserInput({ ...userInput, prompt: e.target.value })

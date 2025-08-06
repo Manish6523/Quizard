@@ -148,7 +148,6 @@ export default function DashboardPage() {
     const fetchqqq = async () => {
       if (user) {
         const fetchedChats = await fetchChats();
-        console.log("Fetched chats:", fetchedChats);
         setChats(fetchedChats || []);
       }
     }
