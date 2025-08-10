@@ -8,6 +8,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -149,20 +150,20 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-8 mt-20">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          <Settings className="w-8 h-8" />
+    <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-8 pt-20 md:mt-20">
+      <header className="my-8">
+        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-3">
+          <Settings className="w-7 h-7 sm:w-8 sm:h-8" />
           Quiz Settings
         </h1>
-        <p className="text-muted-foreground text-lg mt-2">
+        <p className="text-muted-foreground text-base sm:text-lg mt-2">
           Configure the experience for{" "}
           <span className="font-semibold text-primary">{quiz.title}</span>.
         </p>
       </header>
 
       <Tabs defaultValue="access" className="w-full">
-        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
           <TabsTrigger value="access"><Lock className="w-4 h-4 mr-2" />Access & Security</TabsTrigger>
           <TabsTrigger value="timing"><Clock className="w-4 h-4 mr-2" />Timing & Pacing</TabsTrigger>
           <TabsTrigger value="experience"><MousePointerClick className="w-4 h-4 mr-2" />In-Quiz Experience</TabsTrigger>
@@ -178,7 +179,7 @@ export default function SettingsPage() {
                 <Input id="accessCode" placeholder="e.g., BIOLOGY101" value={settings.accessCode || ""} onChange={(e) => handleSettingChange("accessCode", e.target.value)} />
               </div>
               <div className="flex items-center justify-between rounded-lg border p-4 shadow-sm">
-                <Label htmlFor="oneAttempt" className="flex flex-col gap-1">
+                <Label htmlFor="oneAttempt" className="flex flex-col gap-1 pr-4">
                   <span className="font-semibold">One Attempt Per Person</span>
                   <span className="text-xs text-muted-foreground">Prevents students from retaking the quiz.</span>
                 </Label>
@@ -214,21 +215,21 @@ export default function SettingsPage() {
             <TabsContent value="experience" className="space-y-6">
                 <CardTitle>In-Quiz Experience</CardTitle>
                 <div className="flex items-center justify-between rounded-lg border p-4 shadow-sm">
-                    <Label htmlFor="shuffleQuestions" className="flex flex-col gap-1">
+                    <Label htmlFor="shuffleQuestions" className="flex flex-col gap-1 pr-4">
                         <span className="font-semibold">Shuffle Questions</span>
                         <span className="text-xs text-muted-foreground">Randomize question order for each attempt.</span>
                     </Label>
                     <Switch id="shuffleQuestions" checked={settings.shuffleQuestions || false} onCheckedChange={(checked) => handleSettingChange("shuffleQuestions", checked)} />
                 </div>
                 <div className="flex items-center justify-between rounded-lg border p-4 shadow-sm">
-                    <Label htmlFor="shuffleAnswers" className="flex flex-col gap-1">
+                    <Label htmlFor="shuffleAnswers" className="flex flex-col gap-1 pr-4">
                         <span className="font-semibold">Shuffle Answers</span>
                         <span className="text-xs text-muted-foreground">Randomize answer order for each question.</span>
                     </Label>
                     <Switch id="shuffleAnswers" checked={settings.shuffleAnswers || false} onCheckedChange={(checked) => handleSettingChange("shuffleAnswers", checked)} />
                 </div>
                  <div className="flex items-center justify-between rounded-lg border p-4 shadow-sm">
-                    <Label htmlFor="allowBacktracking" className="flex flex-col gap-1">
+                    <Label htmlFor="allowBacktracking" className="flex flex-col gap-1 pr-4">
                         <span className="font-semibold">Allow Backtracking</span>
                         <span className="text-xs text-muted-foreground">Allow students to go back to previous questions.</span>
                     </Label>
@@ -260,14 +261,14 @@ export default function SettingsPage() {
                 </Select>
               </div>
               <div className="flex items-center justify-between rounded-lg border p-4 shadow-sm">
-                <Label htmlFor="showCorrectAnswers" className="flex flex-col gap-1">
+                <Label htmlFor="showCorrectAnswers" className="flex flex-col gap-1 pr-4">
                   <span className="font-semibold">Show Correct Answers</span>
                   <span className="text-xs text-muted-foreground">Students can see the right answers after finishing.</span>
                 </Label>
                 <Switch id="showCorrectAnswers" checked={settings.feedbackAndResults?.showCorrectAnswers ?? true} onCheckedChange={(checked) => handleNestedSettingChange('feedbackAndResults', 'showCorrectAnswers', checked)} />
               </div>
                <div className="flex items-center justify-between rounded-lg border p-4 shadow-sm">
-                <Label htmlFor="showAnswerExplanations" className="flex flex-col gap-1">
+                <Label htmlFor="showAnswerExplanations" className="flex flex-col gap-1 pr-4">
                   <span className="font-semibold">Show Answer Explanations</span>
                   <span className="text-xs text-muted-foreground">Show AI-generated explanations on the results page.</span>
                 </Label>
@@ -282,12 +283,13 @@ export default function SettingsPage() {
         </Card>
       </Tabs>
 
-      <footer className="mt-8 flex justify-end gap-4 border-t pt-6">
+      <footer className="mt-8 flex flex-col sm:flex-row justify-end gap-4 border-t pt-6">
         <Button
           variant="outline"
           size="lg"
           onClick={() => handleSave("draft")}
           disabled={isSaving}
+          className="w-full sm:w-auto"
         >
           <Save className="mr-2 h-4 w-4" /> Save as Draft
         </Button>
@@ -295,6 +297,7 @@ export default function SettingsPage() {
           size="lg"
           onClick={() => handleSave("published")}
           disabled={isSaving}
+          className="w-full sm:w-auto"
         >
           <Share2 className="mr-2 h-4 w-4" />
           {isSaving ? "Publishing..." : "Publish & Get Link"}
