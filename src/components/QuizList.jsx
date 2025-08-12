@@ -230,7 +230,7 @@ export function QuizList() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <Button variant="outline" size="icon" asChild>
-                    <Link href={`/quizzes/results/${quiz.id}`}>
+                    <Link href={`/quizzes/analytics/${quiz.id}`}>
                       <BarChart3 className="h-4 w-4" />
                       <span className="sr-only">View Results</span>
                     </Link>

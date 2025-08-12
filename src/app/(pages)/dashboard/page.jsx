@@ -27,30 +27,28 @@ import {
   CreditCard,
   Menu,
   Sparkles,
+  Users,
+  Target,
+  Trophy,
 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
 import useAuth from "@/hook/useAuth";
 import { QuizList } from "@/components/QuizList";
+import { LineChart, Line, ResponsiveContainer } from "recharts";
+import { AnalyticsView } from "@/components/AnalyticsView";
+import ProfileView from "@/components/ProfileView";
 
 // --- Placeholder Components ---
-const AnalyticsView = ({chats}) => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Analytics</CardTitle>
-      <CardDescription>
-        {chats.map((c) => (
-          <ul key={c.id} className="list-disc pl-5">
-            <li key={c.id} className="mb-2">
-              <Link href={`/quizzes/chat/${c.id}`}>
-                {c.title} - {new Date(c.created_at).toLocaleDateString()}
-              </Link>
-            </li>
-          </ul>
-        ))}
-      </CardDescription>
-    </CardHeader>
-  </Card>
-);
+
 const SettingsView = () => (
   <Card>
     <CardHeader>
@@ -72,65 +70,10 @@ const BillingView = () => (
   </Card>
 );
 
-// --- Main Profile View ---
-const ProfileView = ({ user, avatar }) => (
-  <>
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16">
-            {avatar && <AvatarImage src={avatar} />}
-            <AvatarFallback>
-              <User className="h-8 w-8" />
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <CardTitle className="text-xl md:text-2xl">
-              {user?.profile?.full_name || "Welcome!"}
-            </CardTitle>
-            <CardDescription>
-              @{user?.profile?.username || "username"}
-            </CardDescription>
-          </div>
-        </div>
-        <EditProfileDialog user={user} />
-      </CardHeader>
-    </Card>
-    <Card>
-      <CardHeader>
-        <CardTitle>Account Details</CardTitle>
-      </CardHeader>
-      <CardContent className="grid sm:grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">Email</p>
-          <p>{user?.email}</p>
-        </div>
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">Role</p>
-          <p className="capitalize">{user?.profile?.role}</p>
-        </div>
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">
-            Member Since
-          </p>
-          <p>{new Date(user?.created_at).toLocaleDateString()}</p>
-        </div>
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">
-            Last Sign In
-          </p>
-          <p>{new Date(user?.last_sign_in_at).toLocaleDateString()}</p>
-        </div>
-      </CardContent>
-    </Card>
-  </>
-);
-
 // Icon mapping
 const icons = { FileText, BarChart3, Settings, CreditCard, User };
 
 export default function DashboardPage() {
-
   const { user, loading, avatar, fetchChats } = useAuth();
 
   const [chats, setChats] = useState([]);
@@ -143,17 +86,15 @@ export default function DashboardPage() {
     redirect("/login");
   }
 
-
-  useEffect(()=>{
+  useEffect(() => {
     const fetchqqq = async () => {
       if (user) {
         const fetchedChats = await fetchChats();
         setChats(fetchedChats || []);
       }
-    }
-    fetchqqq()
-  },[user])
-
+    };
+    fetchqqq();
+  }, [user]);
 
   const dashboardNav = [
     { name: "Profile", icon: "User" },
@@ -176,7 +117,7 @@ export default function DashboardPage() {
       case "My Quizzes":
         return <QuizList />;
       case "Analytics":
-        return <AnalyticsView chats={chats} />;
+        return <AnalyticsView />;
       case "Settings":
         return <SettingsView />;
       case "Billing":
@@ -222,7 +163,6 @@ export default function DashboardPage() {
       {/* --- Mobile Header & Main Content --- */}
       <div className="flex flex-col">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-          {/* === MOBILE MENU RESTORED HERE === */}
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <Button
@@ -265,9 +205,7 @@ export default function DashboardPage() {
               </nav>
             </SheetContent>
           </Sheet>
-          {/* === END OF RESTORED MENU === */}
           <div className="w-full flex-1 text-center">
-            {/* Display the active view name in the header */}
             <h1 className="text-xl font-semibold">{activeView}</h1>
           </div>
         </header>

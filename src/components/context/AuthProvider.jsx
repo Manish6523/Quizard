@@ -279,6 +279,69 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  // ?------ analytics functions ------
+  const fetchQuizAnalytics = async (quizId) => {
+    if (!user) return { error: "You must be logged in to view analytics." };
+    if (!quizId) return { error: "Quiz ID is required." };
+
+    try {
+      // Fetch the quiz and all of its attempts, now including the new fields
+      const { data, error } = await client
+        .from("quiz_sets")
+        .select(
+          `
+          title,
+          quizzes, 
+          quiz_attempts (
+            participant_name,
+            score,
+            created_at,
+            user_id,
+            submitted_answers
+          )
+        `
+        )
+        .eq("id", quizId)
+        .eq("creator_id", user.id) // Security: Ensures only the creator can see results
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return { success: true, analytics: data };
+    } catch (error) {
+      console.error("Error fetching quiz analytics:", error);
+      return { error: "Failed to load quiz analytics." };
+    }
+  };
+
+  const fetchOverallAnalytics = async () => {
+    try {
+      if (!user) return { error: "You must be logged in." };
+
+      const { data, error } = await client
+        .from("quiz_sets")
+        .select(
+          `
+        id,
+        title,
+        quizzes,
+        quiz_attempts (
+          score
+        )
+      `
+        )
+        .eq("creator_id", user.id);
+
+      if (error) throw error;
+      return { success: true, allQuizzes: data };
+    } catch (error) {
+      console.error("Error fetching overall analytics:", error);
+      return { error: "Failed to load overall quiz analytics." };
+    }
+  };
+
   const states = { user, loading, coin, avatar };
   const actions = {
     refetchUser,
@@ -293,6 +356,8 @@ const AuthProvider = ({ children }) => {
     fetchQuizById,
     submitQuizResult,
     updateQuizSettings,
+    fetchQuizAnalytics,
+    fetchOverallAnalytics
   };
 
   return (
