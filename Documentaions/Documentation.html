@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Quiz App - Interactive Project Documentation</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .sidebar-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .sidebar-link.active, .sidebar-link:hover {
+            background-color: #e2e8f0;
+            color: #0f172a;
+            transform: translateX(4px);
+        }
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .content-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-btn.active {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        }
+        .accordion-content.open {
+            max-height: 500px;
+            transition: max-height 0.5s ease-in;
+        }
+        
+        .arch-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .arch-box {
+            background-color: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            min-width: 180px;
+        }
+        .arch-connector {
+            position: relative;
+            width: 2px;
+            background-color: #94a3b8;
+            height: 2rem;
+        }
+        .arch-connector::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #94a3b8;
+        }
+        .arch-row {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .arch-col {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             gap: 1rem;
+        }
+        .arch-horizontal-connector {
+            position: absolute;
+            height: 2px;
+            background-color: #94a3b8;
+            top: 50%;
+            left: 100%;
+            width: 2rem;
+        }
+         .arch-horizontal-connector::after {
+            content: '';
+            position: absolute;
+            right: -1px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-left: 8px solid #94a3b8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="flex h-screen">
+        <aside class="w-64 bg-white h-screen border-r border-slate-200 p-6 hidden md:block shrink-0">
+            <h1 class="text-xl font-bold text-slate-900 mb-8">AI Quiz App 📝</h1>
+            <nav id="sidebar-nav" class="space-y-2 h-full overflow-hidden overflow-y-auto">
+                <a href="#overview" class="sidebar-link active flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>📖</span> Overview
+                </a>
+                <a href="#features" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>✨</span> Features
+                </a>
+                <a href="#user-roles" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>👥</span> User Roles
+                </a>
+                <a href="#core-modules" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>🧠</span> Core Modules
+                </a>
+                <a href="#tech-stack" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>🚀</span> Tech Stack
+                </a>
+                <a href="#authentication" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>🔐</span> Authentication
+                </a>
+                <a href="#database-schema" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>🗃️</span> Database Schema
+                </a>
+                <a href="#ai-integration" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>🧪</span> AI Integration
+                </a>
+                <a href="#api-endpoints" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>📦</span> API Endpoints
+                </a>
+                <a href="#architecture" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>🏗️</span> Architecture
+                </a>
+                <a href="#ui-overview" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>🏠</span> UI Overview
+                </a>
+                <a href="#naming-conventions" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>📋</span> Naming Conventions
+                </a>
+                <a href="#contribution-guidelines" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>🛠️</span> Contribution Guidelines
+                </a>
+                <a href="#setup-instructions" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>⚙️</span> Setup Instructions
+                </a>
+                <a href="#deployment" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>🚀</span> Deployment
+                </a>
+                <a href="#roadmap" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>📈</span> Roadmap
+                </a>
+                <a href="#license" class="sidebar-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-600 font-medium">
+                    <span>📝</span> License
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-6 md:p-10">
+            
+            <header class="md:hidden flex justify-between items-center mb-6">
+                 <h1 class="text-xl font-bold text-slate-900">AI Quiz App 📝</h1>
+                 <button id="mobile-menu-btn" class="p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                 </button>
+            </header>
+            <div id="mobile-menu" class="md:hidden hidden mb-6 bg-white p-4 rounded-lg shadow-md">
+                 <nav id="mobile-sidebar-nav" class="space-y-2">
+                 </nav>
+            </div>
+
+            <div id="content-container">
+                <section id="overview" class="content-section active">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">📖 Overview</h2>
+                    <p class="text-lg text-slate-600 mb-8">This section provides a high-level understanding of the AI-powered quiz platform, its purpose, and core value proposition.</p>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                        <p class="text-slate-700 leading-relaxed">
+                            An AI-powered platform that allows educators to generate quizzes and tests using natural language prompts. The platform enables easy sharing via links, provides real-time scoring, AI-generated explanations, and performance analytics — all within a secure, user-friendly interface.
+                            <br><br>
+                            This platform bridges the gap between teachers and modern AI by allowing:
+                            <ul class="list-disc list-inside mt-4 space-y-2">
+                                <li>Quiz generation using AI prompts.</li>
+                                <li>Manual editing of question sets.</li>
+                                <li>Sharing quizzes with students via a link.</li>
+                                <li>Timed quiz attempts and scoring.</li>
+                                <li>Real-time analytics and feedback.</li>
+                            </ul>
+                        </p>
+                    </div>
+                </section>
+
+                <section id="features" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">✨ Features</h2>
+                    <p class="text-lg text-slate-600 mb-8">Discover the key functionalities that make this platform powerful and user-friendly for educators and students.</p>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                        <ul class="space-y-3 text-slate-700 list-disc list-inside">
+                            <li>🔮 <b>AI Quiz Generator</b> – Convert text prompts into structured quiz formats (MCQs, True/False, Short Answer).</li>
+                            <li>✏️ <b>Quiz Editor</b> – Edit AI-generated quizzes manually.</li>
+                            <li>🔗 <b>Sharable Links</b> – Generate quiz URLs with access controls.</li>
+                            <li>⏱️ <b>Timer Support</b> – Add quiz durations and enforce deadlines.</li>
+                            <li>📊 <b>Live Analytics</b> – Track quiz attempts, scores, and response accuracy.</li>
+                            <li>🧠 <b>Bloom’s Taxonomy Levels</b> – Choose difficulty (Knowledge, Application, Evaluation).</li>
+                            <li>📥 <b>Export Results</b> – Download quiz results as CSV or PDF.</li>
+                            <li>🧪 <b>Auto Grading</b> – Immediate feedback with explanations.</li>
+                        </ul>
+                    </div>
+                </section>
+                
+                <section id="user-roles" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">👥 User Roles</h2>
+                    <p class="text-lg text-slate-600 mb-8">Understand the different types of users and their respective permissions and interactions within the platform.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-xl mb-3 text-slate-900">👨‍🏫 Teacher</h3>
+                            <ul class="space-y-2 text-slate-700 list-disc list-inside">
+                                <li>Login via secure authentication.</li>
+                                <li>Input prompt → AI generates quiz.</li>
+                                <li>Edit questions.</li>
+                                <li>Share quiz and track responses.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-xl mb-3 text-slate-900">🎓 Student</h3>
+                            <ul class="space-y-2 text-slate-700 list-disc list-inside">
+                                <li>Access quiz link (no login needed).</li>
+                                <li>Attempt quiz and submit answers.</li>
+                                <li>Receive score and (optional) feedback.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                             <h3 class="font-bold text-xl mb-3 text-slate-900">🛡️ Admin (optional)</h3>
+                            <ul class="space-y-2 text-slate-700 list-disc list-inside">
+                                <li>Manage users and content.</li>
+                                <li>Review abusive activity or spam.</li>
+                                <li>Oversee AI usage and system health.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="core-modules" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">🧠 Core Modules</h2>
+                    <p class="text-lg text-slate-600 mb-8">This section details the fundamental building blocks and their responsibilities within the application.</p>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-100 text-slate-600">
+                                <tr>
+                                    <th class="p-3">Module</th>
+                                    <th class="p-3">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"> <td class="p-3 font-semibold">Quiz Generator</td> <td class="p-3">Accepts prompts, calls OpenAI API, returns a structured list of questions.</td> </tr>
+                                <tr class="border-b"> <td class="p-3 font-semibold">Editor UI</td> <td class="p-3">React-based UI for teachers to edit AI output before saving.</td> </tr>
+                                <tr class="border-b"> <td class="p-3 font-semibold">Quiz Player</td> <td class="p-3">Timer, progress tracker, navigation for quiz takers.</td> </tr>
+                                <tr class="border-b"> <td class="p-3 font-semibold">Results Engine</td> <td class="p-3">Calculates scores, shows explanations, stores analytics.</td> </tr>
+                                <tr class="border-b"> <td class="p-3 font-semibold">Dashboard</td> <td class="p-3">Lists all quizzes created by a teacher, responses, and analytics.</td> </tr>
+                                <tr class="border-b"> <td class="p-3 font-semibold">Sharing/Links</td> <td class="p-3">Secure URLs for quizzes, with expiration, limits, and visibility controls.</td> </tr>
+                                <tr class="border-b"> <td class="p-3 font-semibold">Auth System</td> <td class="p-3">Teacher login via Supabase Auth or NextAuth.js.</td> </tr>
+                                <tr class="border-b"> <td class="p-3 font-semibold">Analytics System</td> <td class="p-3">Tracks quiz-level and question-level performance.</td> </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="tech-stack" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">🚀 Tech Stack</h2>
+                    <p class="text-lg text-slate-600 mb-8">An overview of the core technologies powering the platform, categorized by their role in the architecture.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-xl mb-3 text-slate-900">Frontend 🖥️</h3>
+                            <ul class="space-y-2 text-slate-700 list-disc list-inside">
+                                <li>Next.js (React)</li>
+                                <li>Tailwind CSS</li>
+                                <li>ShadCN</li>
+                                <li>Framer Motion (for animations)</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-xl mb-3 text-slate-900">Backend & Database 🗄️</h3>
+                            <ul class="space-y-2 text-slate-700 list-disc list-inside">
+                                <li>Backend API: Next.js API Routes</li>
+                                <li>Database: Supabase (PostgreSQL)</li>
+                                <li>Auth: Supabase Auth</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                             <h3 class="font-bold text-xl mb-3 text-slate-900">AI & Hosting ☁️</h3>
+                            <ul class="space-y-2 text-slate-700 list-disc list-inside">
+                                <li>AI Provider: OpenAI GPT-3.5 / GPT-4</li>
+                                <li>Hosting: Vercel or Render</li>
+                                <li>CI/CD: GitHub Actions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="authentication" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">🔐 Authentication</h2>
+                    <p class="text-lg text-slate-600 mb-8">Details on how user authentication is handled, ensuring secure access for teachers while providing seamless access for students.</p>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                        <p class="text-slate-700 leading-relaxed">
+                            Supabase provides email/password and third-party OAuth (Google) logins.
+                            <ul class="list-disc list-inside mt-4 space-y-2">
+                                <li>Protected routes ensure that only logged-in teachers can access dashboards.</li>
+                                <li>Students do not need to log in — quiz links are access-controlled via query tokens or UUIDs.</li>
+                            </ul>
+                        </p>
+                    </div>
+                </section>
+                
+                <section id="database-schema" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">🗃️ Database Schema</h2>
+                    <p class="text-lg text-slate-600 mb-8">The structure of the data tables in our PostgreSQL database (managed by Supabase).</p>
+                     <div id="db-tabs" class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                        <div class="border-b border-slate-200 mb-6 flex flex-wrap -mb-px">
+                            <button class="tab-btn active px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-blue-500" data-target="table-profiles">profiles</button>
+                            <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-blue-500" data-target="table-quiz-sets">quiz_sets</button>
+                            <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-blue-500" data-target="table-questions">questions</button>
+                            <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-blue-500" data-target="table-quiz-attempts">quiz_attempts</button>
+                        </div>
+                        <div id="db-content" class="overflow-x-auto">
+                            <div id="table-profiles" class="tab-content active">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600"><tr><th class="p-3">Column</th><th class="p-3">Type</th><th class="p-3">Description</th></tr></thead>
+                                    <tbody>
+                                        <tr class="border-b"> <td class="p-3 font-mono">id</td> <td class="p-3 font-mono">UUID</td> <td class="p-3">Primary Key, references auth.users</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">username</td> <td class="p-3 font-mono">text</td> <td class="p-3">User's unique username</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">full_name</td> <td class="p-3 font-mono">text</td> <td class="p-3">User's full name</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">role</td> <td class="p-3 font-mono">text</td> <td class="p-3">User role (creator, participant)</td> </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="table-quiz-sets" class="tab-content hidden">
+                               <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600"><tr><th class="p-3">Column</th><th class="p-3">Type</th><th class="p-3">Description</th></tr></thead>
+                                    <tbody>
+                                        <tr class="border-b"> <td class="p-3 font-mono">id</td> <td class="p-3 font-mono">UUID</td> <td class="p-3">Primary Key</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">creator_id</td> <td class="p-3 font-mono">UUID</td> <td class="p-3">FK to profiles.id</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">title</td> <td class="p-3 font-mono">text</td> <td class="p-3">Title of the quiz set</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">status</td> <td class="p-3 font-mono">text</td> <td class="p-3">draft, published, or archived</td> </tr>
+                                         <tr class="border-b"> <td class="p-3 font-mono">settings</td> <td class="p-3 font-mono">jsonb</td> <td class="p-3">Quiz settings (e.g. time limit)</td> </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="table-questions" class="tab-content hidden">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600"><tr><th class="p-3">Column</th><th class="p-3">Type</th><th class="p-3">Description</th></tr></thead>
+                                    <tbody>
+                                        <tr class="border-b"> <td class="p-3 font-mono">id</td> <td class="p-3 font-mono">UUID</td> <td class="p-3">Primary Key</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">quiz_set_id</td> <td class="p-3 font-mono">UUID</td> <td class="p-3">FK to quiz_sets.id</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">question_text</td> <td class="p-3 font-mono">text</td> <td class="p-3">The question itself</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">question_type</td> <td class="p-3 font-mono">text</td> <td class="p-3">multiple_choice, true_false, etc.</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">options</td> <td class="p-3 font-mono">jsonb</td> <td class="p-3">Answer options</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">correct_answer</td> <td class="p-3 font-mono">jsonb</td> <td class="p-3">The correct answer(s)</td> </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="table-quiz-attempts" class="tab-content hidden">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600"><tr><th class="p-3">Column</th><th class="p-3">Type</th><th class="p-3">Description</th></tr></thead>
+                                    <tbody>
+                                        <tr class="border-b"> <td class="p-3 font-mono">id</td> <td class="p-3 font-mono">UUID</td> <td class="p-3">Primary Key</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">quiz_set_id</td> <td class="p-3 font-mono">UUID</td> <td class="p-3">FK to quiz_sets.id</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">participant_id</td> <td class="p-3 font-mono">UUID</td> <td class="p-3">FK to profiles.id</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">score</td> <td class="p-3 font-mono">integer</td> <td class="p-3">Participant's final score</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">answers</td> <td class="p-3 font-mono">jsonb</td> <td class="p-3">Participant's submitted answers</td> </tr>
+                                        <tr class="border-b"> <td class="p-3 font-mono">status</td> <td class="p-3 font-mono">text</td> <td class="p-3">in_progress, completed</td> </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                     </div>
+                </section>
+                
+                <section id="ai-integration" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">🧪 AI Integration</h2>
+                    <p class="text-lg text-slate-600 mb-8">This section details how the platform interacts with the AI model to generate quiz content, including input and output formats.</p>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                        <p class="text-slate-700 leading-relaxed mb-4">
+                            Prompt passed to OpenAI via `generateQuestions(prompt: string)`.
+                            Receives structured JSON format:
+                        </p>
+                        <pre class="bg-slate-900 text-white p-4 rounded-lg text-sm mb-4">
+[
+  {
+    "question": "What is the capital of France?",
+    "options": ["Paris", "London", "Berlin", "Madrid"],
+    "answer": "Paris",
+    "explanation": "Paris is the capital and most populous city of France."
+  }
+]
+                        </pre>
+                        <p class="text-slate-700 leading-relaxed">
+                            You can control:
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>Question count</li>
+                                <li>Difficulty</li>
+                                <li>Type (MCQ, TF, Short Answer)</li>
+                            </ul>
+                        </p>
+                    </div>
+                </section>
+
+                <section id="api-endpoints" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">📦 API Endpoints</h2>
+                    <p class="text-lg text-slate-600 mb-8">An interactive list of the primary API routes, detailing their purpose and functionality within the application.</p>
+                     <div class="space-y-3" id="api-accordion">
+                         <div class="accordion-item bg-white border rounded-lg">
+                            <button class="accordion-header w-full text-left p-4 font-semibold flex justify-between items-center">
+                                <span>POST /api/generate</span>
+                                <span class="text-xl transform transition-transform">+</span>
+                            </button>
+                            <div class="accordion-content px-4 pb-4">
+                               <p class="text-slate-600">Purpose: Generate quiz via OpenAI.</p>
+                               <pre class="bg-slate-100 p-3 rounded-md text-sm mt-2">Method: POST</pre>
+                            </div>
+                        </div>
+                         <div class="accordion-item bg-white border rounded-lg">
+                            <button class="accordion-header w-full text-left p-4 font-semibold flex justify-between items-center">
+                                <span>POST /api/quizzes/create</span>
+                                <span class="text-xl transform transition-transform">+</span>
+                            </button>
+                            <div class="accordion-content px-4 pb-4">
+                                <p class="text-slate-600">Purpose: Save quiz to DB.</p>
+                                <pre class="bg-slate-100 p-3 rounded-md text-sm mt-2">Method: POST</pre>
+                            </div>
+                        </div>
+                        <div class="accordion-item bg-white border rounded-lg">
+                            <button class="accordion-header w-full text-left p-4 font-semibold flex justify-between items-center">
+                                <span>GET /api/quizzes/:id</span>
+                                <span class="text-xl transform transition-transform">+</span>
+                            </button>
+                            <div class="accordion-content px-4 pb-4">
+                                <p class="text-slate-600">Purpose: Fetch a quiz by ID.</p>
+                                <pre class="bg-slate-100 p-3 rounded-md text-sm mt-2">Method: GET</pre>
+                            </div>
+                        </div>
+                        <div class="accordion-item bg-white border rounded-lg">
+                            <button class="accordion-header w-full text-left p-4 font-semibold flex justify-between items-center">
+                                <span>POST /api/submit</span>
+                                <span class="text-xl transform transition-transform">+</span>
+                            </button>
+                            <div class="accordion-content px-4 pb-4">
+                                <p class="text-slate-600">Purpose: Submit student answers.</p>
+                                <pre class="bg-slate-100 p-3 rounded-md text-sm mt-2">Method: POST</pre>
+                            </div>
+                        </div>
+                        <div class="accordion-item bg-white border rounded-lg">
+                            <button class="accordion-header w-full text-left p-4 font-semibold flex justify-between items-center">
+                                <span>GET /api/results/:id</span>
+                                <span class="text-xl transform transition-transform">+</span>
+                            </button>
+                            <div class="accordion-content px-4 pb-4">
+                                <p class="text-slate-600">Purpose: View results for a quiz.</p>
+                                <pre class="bg-slate-100 p-3 rounded-md text-sm mt-2">Method: GET</pre>
+                            </div>
+                        </div>
+                     </div>
+                </section>
+
+                <section id="architecture" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">🏗️ High-Level Architecture</h2>
+                    <p class="text-lg text-slate-600 mb-8">A visual representation of the application's structure and data flow, detailing how different components interact.</p>
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                           <h3 class="text-xl font-bold mb-6 text-center text-slate-800">System Diagram</h3>
+                           <div class="arch-diagram">
+                                <div class="arch-box">User Browser/Client</div>
+                                <div class="arch-connector"></div>
+                                <div class="arch-box relative">
+                                    Next.js Frontend
+                                    <div class="arch-horizontal-connector"></div>
+                                </div>
+                                <div class="arch-connector"></div>
+                                <div class="arch-box">Next.js API Routes</div>
+                                <div class="arch-connector"></div>
+                                <div class="arch-row">
+                                    <div class="arch-col">
+                                        <div class="arch-box">🤖 AI Model Provider</div>
+                                    </div>
+                                    <div class="arch-col">
+                                         <div class="arch-box">🗄️ Supabase Backend</div>
+                                    </div>
+                                </div>
+                           </div>
+                        </div>
+                        <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="text-xl font-bold mb-4 text-slate-800">Flow Description</h3>
+                             <ol class="space-y-3 text-slate-700 list-decimal list-inside">
+                                <li><b>User Interaction:</b> Users interact with the Next.js frontend to create prompts, manage quizzes, or take tests.</li>
+                                <li><b>Quiz Generation:</b> The frontend sends a request to a Next.js API route.</li>
+                                <li><b>AI Integration:</b> The API route makes a server-side call to the AI model, passing the user's prompt.</li>
+                                <li><b>Data Persistence:</b> The AI model returns generated questions, which the API route stores in the Supabase database.</li>
+                                <li><b>Quiz Retrieval & Attempt:</b> The frontend fetches quiz questions from Supabase for participants.</li>
+                                <li><b>Authentication:</b> Supabase Auth handles user sign-up, login, and session management.</li>
+                                <li><b>Quiz Submission & Scoring:</b> On completion, answers are sent to an API route, which updates the score in Supabase.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </section>
+                
+                 <section id="ui-overview" class="content-section">
+                     <h2 class="text-3xl font-bold text-slate-900 mb-2">🏠 User Interface Overview</h2>
+                    <p class="text-lg text-slate-600 mb-8">This section highlights the primary pages and interfaces users will interact with in the application, providing a visual roadmap of the user journey.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-lg mb-2">🏡 Home/Landing Page</h3>
+                            <p class="text-sm text-slate-600">The entry point for all users, providing an overview and calls to action.</p>
+                        </div>
+                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-lg mb-2">🧑‍💻 Creator Dashboard</h3>
+                            <p class="text-sm text-slate-600">A central hub for logged-in creators to view, manage, and create new quizzes.</p>
+                        </div>
+                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-lg mb-2">➕ Quiz Creation Page</h3>
+                            <p class="text-sm text-slate-600">Interface for AI prompt input, customization, and question review.</p>
+                        </div>
+                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-lg mb-2">📝 Quiz Attempt Page</h3>
+                            <p class="text-sm text-slate-600">The clean and simple interface where participants take quizzes.</p>
+                        </div>
+                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-lg mb-2">🏆 Results Page</h3>
+                            <p class="text-sm text-slate-600">Displays quiz outcomes and detailed analytics.</p>
+                        </div>
+                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-lg mb-2">🚪 Authentication Pages</h3>
+                            <p class="text-sm text-slate-600">Standard forms for user registration and login.</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="naming-conventions" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">📋 Naming Conventions</h2>
+                    <p class="text-lg text-slate-600 mb-8">Guidelines for consistent naming across the project's codebase and database, promoting readability and maintainability.</p>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                        <ul class="space-y-3 text-slate-700 list-disc list-inside">
+                            <li><b>Files:</b> PascalCase for components, camelCase for utils.</li>
+                            <li><b>Variables:</b> camelCase.</li>
+                            <li><b>Functions:</b> Verb-based (e.g., `generateQuestions`, `submitQuiz`).</li>
+                            <li><b>Pages:</b> Match route names (e.g., `quiz.tsx`, `dashboard.tsx`).</li>
+                            <li><b>Database Tables:</b> snake_case (e.g., `quiz_questions`).</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="contribution-guidelines" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">🛠️ Contribution Guidelines</h2>
+                    <p class="text-lg text-slate-600 mb-8">Instructions for developers interested in contributing to the project, outlining the process for code submissions and collaboration.</p>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                        <ul class="space-y-3 text-slate-700 list-disc list-inside">
+                            <li>Fork the repository.</li>
+                            <li>Create a new branch: `git checkout -b feature/your-feature-name`.</li>
+                            <li>Commit changes: `git commit -m "Add: new feature"`.</li>
+                            <li>Push to branch: `git push origin feature/your-feature-name`.</li>
+                            <li>Submit a pull request.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="setup-instructions" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">⚙️ Setup Instructions</h2>
+                    <p class="text-lg text-slate-600 mb-8">Follow these steps to get the project up and running for local development.</p>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
+                        <div>
+                            <h3 class="font-semibold text-lg mb-2">1. Clone the repository</h3>
+                            <pre class="bg-slate-900 text-white p-4 rounded-lg text-sm">git clone &lt;https://github.com/your-username/ai-quiz-generator.git&gt;
+cd ai-quiz-generator</pre>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-lg mb-2">2. Install dependencies</h3>
+                            <pre class="bg-slate-900 text-white p-4 rounded-lg text-sm">npm install</pre>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-lg mb-2">3. Create and configure .env.local</h3>
+                            <p class="text-sm text-slate-600 mb-2">Copy the example file and fill in your OpenAI, Supabase, and other keys.</p>
+                            <pre class="bg-slate-900 text-white p-4 rounded-lg text-sm">cp .env.example .env.local</pre>
+                        </div>
+                         <div>
+                            <h3 class="font-semibold text-lg mb-2">4. Run the development server</h3>
+                            <pre class="bg-slate-900 text-white p-4 rounded-lg text-sm">npm run dev</pre>
+                            <p class="text-sm text-slate-600 mt-2">⚠️ Make sure your Supabase project has the necessary tables: `quizzes`, `questions`, `responses`, `users`.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="deployment" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">🚀 Deployment</h2>
+                    <p class="text-lg text-slate-600 mb-8">How to deploy the application to common hosting platforms, ensuring easy continuous integration and delivery.</p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-xl mb-3 text-slate-900">Vercel</h3>
+                            <ul class="space-y-2 text-slate-700 list-disc list-inside">
+                                <li>Push to GitHub.</li>
+                                <li>Import project on Vercel.</li>
+                                <li>Add environment variables.</li>
+                                <li>Click deploy!</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-xl mb-3 text-slate-900">Render/Railway</h3>
+                            <ul class="space-y-2 text-slate-700 list-disc list-inside">
+                                <li>Connect GitHub repository.</li>
+                                <li>Set build command: `npm run build`.</li>
+                                <li>Set start command: `npm run start`.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="roadmap" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">📈 Roadmap</h2>
+                    <p class="text-lg text-slate-600 mb-8">A look at the planned features and their current development status, providing insight into the future direction of the project.</p>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                        <ul class="space-y-3 text-slate-700 list-disc list-inside">
+                            <li>✅ Quiz Generator with OpenAI</li>
+                            <li>✅ Editable Quiz Builder</li>
+                            <li>✅ Timed Student Quiz Page</li>
+                            <li>✅ Scoring & Feedback Engine</li>
+                            <li>⏳ Leaderboard System</li>
+                            <li>⏳ Mobile App (React Native)</li>
+                            <li>⏳ LMS Integration (Google Classroom)</li>
+                            <li>⏳ Public Quiz Library / Marketplace</li>
+                            <li>⏳ Multi-language Support</li>
+                            <li>⏳ White-label Mode for Institutions</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="license" class="content-section">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">📝 License</h2>
+                    <p class="text-lg text-slate-600 mb-8">Information regarding the project's licensing, detailing terms of use and distribution.</p>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                        <p class="text-slate-700 leading-relaxed">
+                            This project is licensed under the MIT License.
+                            <br><br>
+                            Developed with ❤️ by Manish Sharma – bringing AI to education, one quiz at a time.
+                        </p>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileNavContainer = document.getElementById('mobile-sidebar-nav');
+            const mainSidebarNav = document.getElementById('sidebar-nav');
+
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            // Clone sidebar for mobile
+            mobileNavContainer.innerHTML = mainSidebarNav.innerHTML;
+            const mobileSidebarLinks = mobileNavContainer.querySelectorAll('.sidebar-link');
+
+            function setActiveLink(targetId) {
+                const targetLink = document.querySelector(`.sidebar-link[href="${targetId}"]`);
+
+                sidebarLinks.forEach(link => link.classList.remove('active'));
+                mobileSidebarLinks.forEach(link => link.classList.remove('active'));
+
+                if (targetLink) {
+                    targetLink.classList.add('active');
+                    const mobileTargetLink = mobileNavContainer.querySelector(`.sidebar-link[href="${targetId}"]`);
+                    if(mobileTargetLink) mobileTargetLink.classList.add('active');
+                }
+            }
+
+            function showContent(targetId) {
+                contentSections.forEach(section => {
+                    if ('#' + section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                setActiveLink(targetId);
+                if (window.innerWidth < 768) {
+                   mobileMenu.classList.add('hidden');
+                }
+            }
+            
+            function handleLinkClick(e) {
+                e.preventDefault();
+                const targetId = e.currentTarget.getAttribute('href');
+                showContent(targetId);
+            }
+
+            sidebarLinks.forEach(link => link.addEventListener('click', handleLinkClick));
+            mobileSidebarLinks.forEach(link => link.addEventListener('click', handleLinkClick));
+
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    tabContents.forEach(content => {
+                        if (content.id === targetId) {
+                            content.classList.remove('hidden');
+                            content.classList.add('active');
+                        } else {
+                            content.classList.add('hidden');
+                            content.classList.remove('active');
+                        }
+                    });
+                });
+            });
+            
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('span:last-child');
+                    
+                    const isOpen = content.classList.contains('open');
+
+                    if (isOpen) {
+                        content.classList.remove('open');
+                        icon.textContent = '+';
+                        icon.classList.remove('rotate-45');
+                    } else {
+                        content.classList.add('open');
+                        icon.textContent = '-';
+                        icon.classList.add('rotate-45');
+                    }
+                });
+            });
+
+            const initialTarget = window.location.hash || '#overview';
+            showContent(initialTarget);
+        });
+    </script>
+</body>
+</html>

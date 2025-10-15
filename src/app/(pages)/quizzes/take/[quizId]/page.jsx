@@ -105,6 +105,7 @@ export default function TakeQuizPage() {
       setLoading(true);
       try {
         const response = await fetchQuizById(quizId);
+        console.log("Quiz Data:", response);
         if (response.error) {
           toast.error("Failed to load quiz", { description: response.error });
           setQuiz(null);
@@ -261,6 +262,36 @@ export default function TakeQuizPage() {
         <Card className="w-full max-w-md text-center">
           <CardHeader><CardTitle>Quiz Not Found</CardTitle></CardHeader>
           <CardContent><p>This quiz could not be found or is no longer available.</p></CardContent>
+        </Card>
+      </div>
+    );
+  }
+  if (quiz.settings?.oneAttemptPerPerson && hasAttempted) {
+    return (
+      <div className="flex items-center justify-center p-4 pt-30">
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
+            <CardTitle className="text-2xl">{quiz.title}</CardTitle>
+            <CardDescription>You have already completed this quiz.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">You can only take this quiz once.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  if (quiz.status === "draft") {
+    return (
+      <div className="flex items-center justify-center p-4 pt-30">
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
+            <CardTitle className="text-2xl">{quiz.title}</CardTitle>    
+            <CardDescription>This quiz not accessable</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">Please contact the quiz creator for more information.</p>
+          </CardContent>
         </Card>
       </div>
     );

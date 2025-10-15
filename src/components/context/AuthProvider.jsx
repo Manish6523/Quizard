@@ -213,7 +213,7 @@ const AuthProvider = ({ children }) => {
       if (!user) return { error: "You must be logged in to fetch a quiz." };
       const { data: quizData, error: quizError } = await client
         .from("quiz_sets")
-        .select("id, title, quizzes,settings,creator_id") // Select the quizzes column
+        .select("id, title, quizzes,settings,creator_id,status") // Select the quizzes column
         .eq("id", quizId)
         .single();
 
