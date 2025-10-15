@@ -79,7 +79,7 @@ export default function Page() {
         shouldCreateUser: true,
         emailRedirectTo: `${
           typeof window !== "undefined" ? window.location.origin : ""
-        }/auth/callback`,
+        }/auth/v1/callback`,
       },
     });
 
@@ -119,7 +119,7 @@ export default function Page() {
       options: {
         redirectTo: `${
           typeof window !== "undefined" ? window.location.origin : ""
-        }/auth/callback`,
+        }/auth/v1/callback`,
       },
     });
   };
